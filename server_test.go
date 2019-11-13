@@ -53,4 +53,13 @@ func TestServer(t *testing.T) {
 		assertContentType(t, response, jsonContentType)
 		assertDeepEqual(t, movie, want)
 	})
+
+	t.Run("404 on missing movie", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/movies/", nil)
+		response := httptest.NewRecorder()
+
+		server.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusNotFound)
+	})
 }

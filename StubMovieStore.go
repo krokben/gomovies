@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // StubMovieStore to implement the functionality of the real store
 type StubMovieStore struct {
 	movies Movies
@@ -18,7 +20,7 @@ func (s *StubMovieStore) GetMovies() Movies {
 }
 
 // GetMovie returns a single movie by ID
-func (s *StubMovieStore) GetMovie(id string) Movie {
+func (s *StubMovieStore) GetMovie(id string) (Movie, error) {
 	var result Movie
 	for _, movie := range s.movies {
 		if movie.Id == id {
@@ -26,5 +28,9 @@ func (s *StubMovieStore) GetMovie(id string) Movie {
 		}
 	}
 
-	return result
+	if result.Id != id {
+		return result, fmt.Errorf("Could not find movie with id %s", id)
+	}
+
+	return result, nil
 }

@@ -11,7 +11,7 @@ const jsonContentType = "application/json"
 // MovieStore is an interface for a movie store
 type MovieStore interface {
 	GetMovies() Movies
-	GetMovie(id string) Movie
+	GetMovie(id string) (Movie, error)
 }
 
 // MovieServer takes a store of movies
@@ -45,11 +45,20 @@ func (s *MovieServer) moviesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *MovieServer) movieHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/movies/"):]
+	if len(id) == 0 {
+		log.Fatal("No id specified")
+	}
+
+	movie, err := s.store.GetMovie(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
 	w.Header().Set("content-type", jsonContentType)
 
-	err := json.NewEncoder(w).Encode(s.store.GetMovie(id))
+	jsonErr := json.NewEncoder(w).Encode(movie)
 	if err != nil {
-		log.Fatal("Could not encode into JSON", err)
+		log.Fatal("Could not encode into JSON", jsonErr)
 	}
 }
