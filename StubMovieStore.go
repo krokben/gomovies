@@ -16,3 +16,15 @@ func NewStubMovieStore(movies Movies) *StubMovieStore {
 func (s *StubMovieStore) GetMovies() Movies {
 	return s.movies
 }
+
+// GetMovie returns a single movie by ID
+func (s *StubMovieStore) GetMovie(id string) Movie {
+	var result Movie
+	for _, movie := range s.movies {
+		if movie.Id == id {
+			result = movie
+		}
+	}
+
+	return result
+}
