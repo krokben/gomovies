@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -55,11 +56,21 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("404 on missing movie", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, "/movies/", nil)
+		request, _ := http.NewRequest(http.MethodGet, "/movies/id3", nil)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 
 		assertStatus(t, response.Code, http.StatusNotFound)
+	})
+
+	t.Run("post a movie", func(t *testing.T) {
+		movie, _ := json.Marshal(Movie{"id3", "Home Alone 3", 5})
+		request, _ := http.NewRequest(http.MethodPost, "/movies", bytes.NewReader(movie))
+		response := httptest.NewRecorder()
+
+		server.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusAccepted)
 	})
 }

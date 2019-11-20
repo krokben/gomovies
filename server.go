@@ -12,6 +12,7 @@ const jsonContentType = "application/json"
 type MovieStore interface {
 	GetMovies() Movies
 	GetMovie(id string) (Movie, error)
+	AddMovie(movie Movie)
 }
 
 // MovieServer takes a store of movies
@@ -35,11 +36,24 @@ func NewMovieServer(store MovieStore) *MovieServer {
 }
 
 func (s *MovieServer) moviesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", jsonContentType)
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("content-type", jsonContentType)
 
-	err := json.NewEncoder(w).Encode(s.store.GetMovies())
-	if err != nil {
-		log.Fatal("Could not encode into JSON", err)
+		err := json.NewEncoder(w).Encode(s.store.GetMovies())
+		if err != nil {
+			log.Fatal("Could not encode into JSON", err)
+		}
+	case http.MethodPost:
+		var movie Movie
+		err := json.NewDecoder(r.Body).Decode(&movie)
+		if err != nil {
+			log.Fatalf("Decoding JSON failed, %v", err)
+		}
+
+		s.store.AddMovie(movie)
+
+		w.WriteHeader(http.StatusAccepted)
 	}
 }
 

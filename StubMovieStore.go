@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // StubMovieStore to implement the functionality of the real store
 type StubMovieStore struct {
@@ -33,4 +35,9 @@ func (s *StubMovieStore) GetMovie(id string) (Movie, error) {
 	}
 
 	return result, nil
+}
+
+// AddMovie takes a JSON object movie and appends to the movies store
+func (s *StubMovieStore) AddMovie(movie Movie) {
+	s.movies = append(s.movies, movie)
 }
